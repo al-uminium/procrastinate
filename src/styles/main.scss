@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&family=Source+Sans+Pro&display=swap');
+$border-test: 1px solid rgb(66, 66, 66);
+$proj-cont-width: 15rem;
+
+@mixin full-height-width {
+    height: 100%;
+    width: 100%;
+}
+@mixin vert-horiz-center {
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin containers {
+    display: grid;
+    overflow-y: auto;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+span:hover {
+    cursor: pointer;
+}
+
+html {
+    &, body {
+        @include full-height-width;
+        font-family: 'Roboto', sans-serif;
+        background-color: #121212;
+        color: #d6d6d6;
+    }
+}
+
+#container {
+    @include full-height-width;
+    display: grid;
+    grid-template-columns: $proj-cont-width auto;
+}
+
+#project-container {
+    @include containers;
+    padding-top: 2rem;
+    justify-content: center;
+    align-content: flex-start
+}
+
+#task-container {
+    @include containers;
+    border-left: 1px solid rgba(66, 66, 66, 0.8);
+    align-content: flex-start ;
+    h1 {
+        padding: 0.5rem;
+        margin: 0rem 2rem;
+    }
+}
+
+.incomplete-tasks {
+    display: grid;
+}
+
+.task-list {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgb(66, 66, 66);
+    padding: 1.5rem 0;
+
+    .task-items {
+        margin-left: 1.5rem;
+    }
+
+    .del {
+        margin-left: 85%;
+    }
+}
+
+.task-list:last-child {
+    border-style: none;
+}
+
+.ctn {
+    border: $border-test;
+    box-sizing: border-box;
+    min-height: 5rem;
+    width: auto;
+    margin: 0rem 2rem;
+    padding: 0.5rem;
+    background-color: rgb(30, 30, 30);
+    border-radius: 1rem;
+}
+
+.completed-tasks {
+    box-sizing: border-box;
+    margin-top: 1.5rem;
+    display: grid;
+}
+
+.completed {
+    color: #424242;
+    // To add different scheme for checkbox
+}
+
+#add-proj {
+    @include vert-horiz-center;
+    
+    display: flex;
+    height: 5rem;
+    width: $proj-cont-width;
+    background-color: #141414;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+#add-btn {
+    @include vert-horiz-center;
+    display: flex;
+    height: 5rem;
+    width: 5rem;
+    border-radius: 1rem;
+    background-color: orangered;
+    position: fixed;
+    bottom: 1.7rem;
+    right: 1.7rem;
+    border-style: none;
+    font-size: 4rem;
+    color: rgba(256,256,256,0.9);
+}
+
+.project-icon {
+    display: flex;
+    height: 4rem;
+    align-items: center;
+    width: $proj-cont-width;
+    font-size: 1.2rem;
+
+    span {
+        font-size: 1.6rem;
+        padding: 0 0.3rem 0 0.7rem;
+        color: rgba(256,256,256, 0.8);
+    }
+}

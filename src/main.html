@@ -4,10 +4,73 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">
+
     <title><%= htmlWebpackPlugin.options.title %></title>
 </head>
 <body>
-    <label for="test">Test</label>
-    <input type="date" id="test">
+    <div id="container">
+        <div id="project-container">
+            <div class="project-icon">
+                <span class="material-icons">inbox</span>
+                Inbox
+            </div>
+            <div class="project-icon">
+                <span class="material-icons">today</span>
+                Today
+            </div>
+            <div class="project-icon">
+                <span class="material-icons">tab</span>
+                OwO
+            </div>
+            <div id="add-proj">
+                Add Project
+            </div>
+        </div>
+        <div id="task-container">
+            <h1 id="task-status">Placeholder Text</h1>
+            <div class="incomplete-tasks ctn">
+                <div class="task-list">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task">
+                        <label for="task"></label>
+                    </div>
+                    <div class="task-items">
+                        <div class="task-title">Title</div>
+                        <div class="task-date">Due Date</div>
+                    </div>
+                    <span class="material-icons del">delete</span>
+                </div>
+                <div class="task-list">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task">
+                        <label for="task"></label>
+                    </div>
+                    <div class="task-items">
+                        <div class="task-title">Title</div>
+                        <div class="task-date">Due Date</div>
+                    </div>
+                    <span class="material-icons del">delete</span>
+                </div>
+            </div>
+            <div class="completed-tasks ctn">
+                <p>Completed Tasks...</p>
+                <div class="task-list completed">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task">
+                        <label for="task"></label>
+                    </div>
+                    <div class="task-items">
+                        <div class="task-title">Title</div>
+                        <div class="task-date">Due Date</div>
+                    </div>
+                    <span class="material-icons del">delete</span>
+                </div>
+            </div>
+            <span class="material-icons" id="add-btn">
+                add_task
+            </span>
+        </div>
+    </div>
 </body>
 </html>

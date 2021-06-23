@@ -6,8 +6,7 @@ const generalInbox = inbox();
 
 //Create new project
 const Project = (projName) => {
-    const i = projects(projName)
-    if 
+    const i = projects(projName);
     generalInbox.allProj.push(i)
     return i
 }
