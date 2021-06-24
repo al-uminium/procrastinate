@@ -18,13 +18,14 @@ const defaultProj = Project("Inbox")
 const Task = (taskTitle,taskDescr, taskDueDate, taskPriority, completeStatus=false, taskProject=defaultProj) => {
     const i = task(taskTitle,taskDescr, taskDueDate, completeStatus=false, taskPriority)
     taskProject.tasks.push(i)
+    return i
 }
 
 //Delete task 
 const delTask = (targetTask) => {
     //targetTask is not an actual task object, so will have to recreate it
 
-    let targetTask = task("","","","","") //placeholder for now
+    // let targetTask = task("","","","","") 
 
     //Find where the task is stored
     //Operation is O(n), maybe can optimize?
@@ -39,3 +40,5 @@ const delTask = (targetTask) => {
         }
     }
 }
+
+export { generalInbox, Project, defaultProj, Task }

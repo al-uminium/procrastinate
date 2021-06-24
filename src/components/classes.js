@@ -3,7 +3,7 @@ const inbox = () => {
     let allProj = [];
 
     const getAllTasks = () => {
-        allTasks = []
+        let allTasks = []
         for (const proj of allProj) {
             proj.tasks.map(task => allTasks.push(task))
         }
