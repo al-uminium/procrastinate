@@ -1,5 +1,5 @@
 import { inbox, projects, task } from './classes.js'
-import { Project, defaultProj, Task, delTask, generalInbox } from './logic.js'
+import { Project, defaultProj, Task, delTask, generalInbox, findTask } from './logic.js'
 
 
 
@@ -16,8 +16,30 @@ const eventListeners = () => {
         let addTaskBtn = document.querySelector("#add-task-btn")
         addTaskBtn.addEventListener("click", () => addTask())
     }
+    const checkboxEL = () => {
+        let checkbox = document.getElementsByClassName("checkbox")
+        for (const box of checkbox) {
+            box.addEventListener("click", () => toggleCompleteStatus())
+        }
+    }
 
     return { coverDivEL, newTaskEL, addTaskEL }
+}
+
+const getTaskDetails = () => {
+    let taskTitle = document.querySelector("#title").value;
+    let taskDueDate = document.querySelector("#task-date").value;
+    let taskDescr = document.querySelector("#descr").value;
+    let taskRadioBtn = document.getElementsByClassName("priority-radio")
+    let priority = ''
+
+    for (const radio of taskRadioBtn) {
+        if (radio.checked) {
+            priority = radio.id
+        }
+    }
+
+    return {taskTitle, taskDueDate, taskDescr, priority}
 }
 
 //Create Modal Form
@@ -68,16 +90,30 @@ const closeModal = (e) => {
     }
 }
 
+// const toggleCompleteStatus = (e) => {
+//     if
+// }
+
 const renderTask = () => {
-    let incompleteTasks = document.querySelector(".incomplete-tasks") 
+    //render task called when pressing add button 
+    //will render all tasks inside inbox, checked or not
+    //checks if isComplete is true, if yes, place it as 
+    let incompleteTasks = document.querySelector(".incomplete-tasks")
+    let completeTasks = document.querySelector(".completed-tasks") 
+
+    setTaskDisplay(incompleteTasks, completeTasks);
+
     incompleteTasks.innerHTML = ""
-    const taskTemplate = (title, descr, duedate, priority) => {
+    completeTasks.innerHTML = ""
+
+    const taskTemplate = (title, descr, duedate, priority, isComplete, i) => {
         let date = (!duedate) ? "" : duedate
+        let complete = (isComplete) ? "checked" : ""
         let html = `
             <div class="task-list">
                 <div class="task-checkbox">
-                    <input type="checkbox" id="task">
-                    <label for="task"></label>
+                    <input type="checkbox" class="checkbox" ${complete} id="${i}">
+                    <label for="${i}"></label>
                 </div>
                 <div class="task-items">
                     <div class="task-title">${title}</div>
@@ -87,33 +123,50 @@ const renderTask = () => {
                 </div>
                 <span class="material-icons del">delete</span>
             </div>
-    `
+        `
         return html
     }
 
     let allTask = generalInbox.getAllTasks()
 
-    for (const task of allTask) {
-        incompleteTasks.innerHTML += taskTemplate(task.title, task.descr, task.dueDate, task.priority)
+    for (let i = 0; i < allTask.length; i++) {
+        let container = (allTask[i].isComplete) ? completeTasks : incompleteTasks
+        container.innerHTML += taskTemplate(
+            allTask[i].title, 
+            allTask[i].descr, 
+            allTask[i].dueDate, 
+            allTask[i].priority, 
+            allTask[i].isComplete,
+            i
+        )
     }
+    // eventListeners().checkboxEl()
 }
 
 const addTask = () => {
-    let taskTitle = document.querySelector("#title");
-    let taskDueDate = document.querySelector("#task-date")
-    let taskDescr = document.querySelector("#descr")
-    let taskRadioBtn = document.getElementsByClassName("priority-radio")
-    let priority = ''
+    let {taskTitle, taskDueDate, taskDescr, priority} = getTaskDetails()
 
-    for (const radio of taskRadioBtn) {
-        if (radio.checked) {
-            priority = radio.id
-        }
-    }
-
-    let newTask = Task(taskTitle.value, taskDescr.value, taskDueDate.value, priority, "false")
+    Task(taskTitle, taskDescr, taskDueDate, priority, "false")
     renderTask()
     removeModal()
 }
 
-export { eventListeners, renderTask }
+const setTaskDisplay = (incompTasks, compTasks) => {
+    let allTasks = generalInbox.getAllTasks()
+
+    let incompCount = 0
+    let compCount = 0
+    for (const task of allTasks) {
+        if (allTasks.length) {
+            if (task.isComplete) compCount++
+            if (!task.isComplete) incompCount++
+        }
+    }
+
+    incompTasks.style.display = (incompCount) ? "grid" : "none"
+    compTasks.style.display = (compCount) ? "grid" : "none"
+    
+    return
+}
+
+export { eventListeners, renderTask, setTaskDisplay }
