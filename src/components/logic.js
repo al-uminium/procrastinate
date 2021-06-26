@@ -15,24 +15,22 @@ const Project = (projName) => {
 const defaultProj = Project("Inbox")
 
 //Create new task
-const Task = (taskTitle,taskDescr, taskDueDate, taskPriority, completeStatus=false, taskProject=defaultProj) => {
+const Task = (taskTitle, taskDescr, taskDueDate, taskPriority, completeStatus=false, taskProject=defaultProj) => {
     const i = task(taskTitle, taskDescr, taskDueDate, completeStatus, taskPriority)
     taskProject.tasks.push(i)
     return i
 }
 
 const findTask = (taskTitle, taskDescr, taskDueDate, taskPriority, completeStatus=false, taskProject=defaultProj) => {
-    let target = Task(taskTitle, taskDescr, taskDueDate, completeStatus, taskPriority)
+    let target = task(taskTitle, taskDescr, taskDueDate, completeStatus, taskPriority)
 
     let inboxTask = taskProject.tasks;
 
     for (const task of inboxTask) {
         if (_.isEqual(target, task)) {
-            return inboxTask.indexOf(task)
+            return _.findIndex(inboxTask, task)
         }
     }
-
-    return -1
 }
 
 //Delete task 

@@ -28,45 +28,52 @@ const eventListeners = () => {
             btn.addEventListener("click", (e) => deleteTask(e))
         }
     }
-
-    return { coverDivEL, newTaskEL, addTaskEL, checkboxEL, delBtnEL }
-}
-
-const getTaskDetails = () => {
-    let taskTitle = document.querySelector("#title").value;
-    let taskDueDate = document.querySelector("#task-date").value;
-    let taskDescr = document.querySelector("#descr").value;
-    let taskRadioBtn = document.getElementsByClassName("priority-radio")
-    let priority = ''
-
-    for (const radio of taskRadioBtn) {
-        if (radio.checked) {
-            priority = radio.id
+    const taskContainerEL = () => {
+        let taskContainer = document.getElementsByClassName("task-list")
+        for (const task of taskContainer) {
+            task.addEventListener("click", (e) => expandTask(e.target))
         }
     }
 
-    return {taskTitle, taskDueDate, taskDescr, priority}
+    return { coverDivEL, newTaskEL, addTaskEL, checkboxEL, delBtnEL, taskContainerEL }
 }
 
+const getTaskModalDetails = () => {
+    let taskTitle = document.querySelector("#title");
+    let taskDueDate = document.querySelector("#task-date");
+    let taskDescr = document.querySelector("#descr");
+    let taskRadioBtn = document.getElementsByClassName("priority-radio")
+    let taskPriority = ''
+
+    for (const radio of taskRadioBtn) {
+        if (radio.checked) {
+            taskPriority = radio.id
+        }
+    }
+
+    return {taskTitle, taskDueDate, taskDescr, taskPriority}
+}
+
+
 //Create Modal Form
-const taskModal = () => {
+const taskModal = (title="Title", date="", descr="Notes here", priority="none") => {
     let div = document.createElement("div")
     div.setAttribute("id", "cover-div")
     div.innerHTML = `
         <div id="task-modal">
             <form class="get-task">
                 <div id="task-title">
-                    <input type="text" id="title" placeholder="Title">
+                    <input type="text" id="title" placeholder="${title}">
                 </div>
                 <div id="task-dueDate">
-                    <input type="date" id="task-date" placeholder="Date">
+                    <input type="date" id="task-date" value=${date}>
                 </div>
                 <div id="task-descr">
-                    <textarea id="descr" spellcheck="false" placeholder="Notes here"></textarea>
+                    <textarea id="descr" spellcheck="false" placeholder="${descr}"></textarea>
                 </div>
                 <div id="task-footer">
                     <div id="radio-container">
-                        <input type="radio" id="none" name="priority" checked class="priority-radio">
+                        <input type="radio" id="none" name="priority" class="priority-radio">
                         <label for="none">None</label>
                         <input type="radio" id="low" name="priority" class="priority-radio">
                         <label for="low">Low</label>
@@ -81,12 +88,17 @@ const taskModal = () => {
         </div>
     `
     document.body.appendChild(div)
+    let taskPriority = document.getElementById(`${priority}`)
+    taskPriority.checked = true
     eventListeners().coverDivEL()
     eventListeners().addTaskEL()
 }
 
 const removeModal = () => {
     let div = document.querySelector("#cover-div");
+    // let {taskTitle, taskDueDate, taskDescr, taskPriority} = getTaskModalDetails()
+    // let index = findTask(taskTitle.placeholder, taskDescr.placeholder, taskDueDate.value, taskPriority)
+    // console.log(index)
     div.remove()
 }
 
@@ -120,7 +132,7 @@ const renderTask = () => {
         let date = (!duedate) ? "" : duedate
         let complete = (isComplete) ? "checked" : ""
         let html = `
-            <div class="task-list">
+            <div class="task-list" data-id=${i}>
                 <div class="task-checkbox">
                     <input type="checkbox" class="checkbox" id="task-${i}" ${complete} data-id=${i}>
                     <label for="task-${i}"></label>
@@ -152,12 +164,12 @@ const renderTask = () => {
     }
     eventListeners().checkboxEL()
     eventListeners().delBtnEL()
+    eventListeners().taskContainerEL()
 }
 
 const addTask = () => {
-    let {taskTitle, taskDueDate, taskDescr, priority} = getTaskDetails()
-
-    Task(taskTitle, taskDescr, taskDueDate, priority)
+    let {taskTitle, taskDueDate, taskDescr, taskPriority} = getTaskModalDetails()
+    Task(taskTitle.value, taskDescr.value, taskDueDate.value, taskPriority)
     renderTask()
     removeModal()
 }
@@ -166,6 +178,13 @@ const deleteTask = (e) => {
     let index = e.target.getAttribute("data-id");
     defaultProj.tasks.splice(index, 1)
     renderTask()
+}
+
+const expandTask = (e) => {
+    let index = e.getAttribute("data-id");
+    // let {title, dueDate, descr, isComplete, priority} = defaultProj.tasks[index] 
+    //default index is empty. used to pass to removeModal() to find the task without having to look for parent node.
+    // taskModal(title, dueDate, descr, priority)
 }
 
 const setTaskDisplay = (incompTasks, compTasks) => {

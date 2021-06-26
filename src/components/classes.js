@@ -28,7 +28,7 @@ const task = (taskTitle="", taskDescr="", taskDueDate=null, completeStatus=false
     let isComplete = completeStatus
     let priority = taskPriority;
 
-    return { title, descr, dueDate, isComplete, priority }
+    return { title, dueDate, descr, isComplete, priority }
 }
 
 export { inbox, projects, task }

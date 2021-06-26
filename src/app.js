@@ -6,10 +6,7 @@ import "./styles/main.scss"
 import "./styles/modal.scss"
 import "./styles/tasks.scss"
 
-
-let task1 = Task("get milk", "go shengshiong get milk", "21/6/2021", "none")
-// let task2 = Task("cry", "cry and then stop crying", "", "high")
-// let task3 = Task("pee", "just pee lol", "", "high", true)
+Task("get milk","get milk in sheng shiong", "2021-06-21", "low")
 
 // console.log(generalInbox.getAllTasks())
 
