@@ -1,7 +1,7 @@
 import { inbox, projects, task } from './classes.js'
 import { Project, defaultProj, Task, delTask, generalInbox, findTask } from './logic.js'
 
-
+//ALL allTasks generated from general inbox are placeholders. Once projects has been implemented, will generalize it to fit all projects.
 
 const eventListeners = () => {
     const coverDivEL = () => {
@@ -19,11 +19,17 @@ const eventListeners = () => {
     const checkboxEL = () => {
         let checkbox = document.getElementsByClassName("checkbox")
         for (const box of checkbox) {
-            box.addEventListener("click", () => toggleCompleteStatus())
+            box.addEventListener("click", (e) => toggleCompleteStatus(e))
+        }
+    }
+    const delBtnEL = () => {
+        let delBtn = document.getElementsByClassName("del")
+        for (const btn of delBtn) {
+            btn.addEventListener("click", (e) => deleteTask(e))
         }
     }
 
-    return { coverDivEL, newTaskEL, addTaskEL }
+    return { coverDivEL, newTaskEL, addTaskEL, checkboxEL, delBtnEL }
 }
 
 const getTaskDetails = () => {
@@ -90,9 +96,13 @@ const closeModal = (e) => {
     }
 }
 
-// const toggleCompleteStatus = (e) => {
-//     if
-// }
+const toggleCompleteStatus = (e) => {
+    let allTasks = generalInbox.getAllTasks(); 
+
+    let index = e.target.getAttribute("data-id");
+    allTasks[index].isComplete = (allTasks[index].isComplete) ? false : true
+    renderTask()
+}
 
 const renderTask = () => {
     //render task called when pressing add button 
@@ -112,8 +122,8 @@ const renderTask = () => {
         let html = `
             <div class="task-list">
                 <div class="task-checkbox">
-                    <input type="checkbox" class="checkbox" ${complete} id="${i}">
-                    <label for="${i}"></label>
+                    <input type="checkbox" class="checkbox" id="task-${i}" ${complete} data-id=${i}>
+                    <label for="task-${i}"></label>
                 </div>
                 <div class="task-items">
                     <div class="task-title">${title}</div>
@@ -121,7 +131,7 @@ const renderTask = () => {
                     <div class="task-descr hidden">${descr}</div>
                     <div class="task-priority hidden">${priority}</div>
                 </div>
-                <span class="material-icons del">delete</span>
+                <span class="material-icons del" data-id="${i}">delete</span>
             </div>
         `
         return html
@@ -140,18 +150,26 @@ const renderTask = () => {
             i
         )
     }
-    // eventListeners().checkboxEl()
+    eventListeners().checkboxEL()
+    eventListeners().delBtnEL()
 }
 
 const addTask = () => {
     let {taskTitle, taskDueDate, taskDescr, priority} = getTaskDetails()
 
-    Task(taskTitle, taskDescr, taskDueDate, priority, "false")
+    Task(taskTitle, taskDescr, taskDueDate, priority)
     renderTask()
     removeModal()
 }
 
+const deleteTask = (e) => {
+    let index = e.target.getAttribute("data-id");
+    defaultProj.tasks.splice(index, 1)
+    renderTask()
+}
+
 const setTaskDisplay = (incompTasks, compTasks) => {
+
     let allTasks = generalInbox.getAllTasks()
 
     let incompCount = 0
