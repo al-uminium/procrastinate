@@ -57,52 +57,6 @@ html {
     }
 }
 
-.task-list {
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid rgb(66, 66, 66);
-    padding: 1.5rem 0;
-
-    .task-items {
-        margin-left: 1.5rem;
-    }
-
-    .del {
-        margin-left: auto;
-    }
-}
-
-.task-list:last-child {
-    border-style: none;
-}
-
-.ctn {
-    border: $border-test;
-    box-sizing: border-box;
-    min-height: 5rem;
-    width: auto;
-    margin: 0rem 2rem;
-    padding: 0.5rem;
-    background-color: rgb(30, 30, 30);
-    border-radius: 1rem;
-}
-
-.incomplete-tasks {
-    display: grid;
-    margin-top: 1.5rem;
-}
-
-.completed-tasks {
-    box-sizing: border-box;
-    margin-top: 1.5rem;
-    display: grid;
-}
-
-.completed {
-    color: #424242;
-    // To add different scheme for checkbox
-}
-
 #add-proj {
     @include vert-horiz-center;
     
@@ -144,6 +98,6 @@ html {
     }
 }
 
-.hidden {
-    display: none;
+#status-color {
+    color: #0f94d1;
 }

@@ -1,0 +1,20 @@
+#focused {
+    background-color: rgba(217, 81, 33, 0.8);
+}
+
+.project-icon {
+    cursor: pointer;
+    &:hover {
+        background-color: rgba(217, 81, 33, 0.4);
+    }
+}
+
+#add-proj {
+    p {
+        border-bottom: 1px solid #141414;
+        cursor: pointer;
+        &:hover {
+            border-bottom: 1px solid white;
+        }
+    }
+}

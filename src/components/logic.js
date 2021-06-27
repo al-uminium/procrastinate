@@ -21,33 +21,14 @@ const Task = (taskTitle, taskDescr, taskDueDate, taskPriority, completeStatus=fa
     return i
 }
 
-const findTask = (taskTitle, taskDescr, taskDueDate, taskPriority, completeStatus=false, taskProject=defaultProj) => {
+const findTask = (taskTitle, taskDescr, taskDueDate, taskPriority, completeStatus=false, taskProject=generalInbox.allProj) => {
     let target = task(taskTitle, taskDescr, taskDueDate, completeStatus, taskPriority)
 
-    let inboxTask = taskProject.tasks;
-
-    for (const task of inboxTask) {
-        if (_.isEqual(target, task)) {
-            return _.findIndex(inboxTask, task)
-        }
-    }
-}
-
-//Delete task 
-const delTask = (targetTask) => {
-    //targetTask is not an actual task object, so will have to recreate it
-
-    // let targetTask = task("","","","","") 
-
-    //Find where the task is stored
-    //Operation is O(n), maybe can optimize?
-    for (const proj of generalInbox) {
-
-        // _.filter(proj, (o) => !(_.isEqual(o, targetTask)))
-
-        for (let i = 0; i < proj.length; i++) {
-            if (_.isEqual(proj[i], targetTask)) {
-                proj.splice(i,1)
+    for (const proj of taskProject) {
+        for (const task of proj.tasks) {
+            if (_.isEqual(target, task)) {
+                let taskIndex = _.findIndex(proj.tasks, target)
+                return [proj.tasks, taskIndex]
             }
         }
     }

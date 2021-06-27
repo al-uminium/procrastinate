@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { inbox, projects, task } from './classes.js'
 import { Project, defaultProj, Task, delTask, generalInbox, findTask } from './logic.js'
 
@@ -34,26 +35,34 @@ const eventListeners = () => {
             task.addEventListener("click", (e) => expandTask(e.target))
         }
     }
-
-    return { coverDivEL, newTaskEL, addTaskEL, checkboxEL, delBtnEL, taskContainerEL }
-}
-
-const getTaskModalDetails = () => {
-    let taskTitle = document.querySelector("#title");
-    let taskDueDate = document.querySelector("#task-date");
-    let taskDescr = document.querySelector("#descr");
-    let taskRadioBtn = document.getElementsByClassName("priority-radio")
-    let taskPriority = ''
-
-    for (const radio of taskRadioBtn) {
-        if (radio.checked) {
-            taskPriority = radio.id
+    const projectEL = () => {
+        let project = document.getElementsByClassName("project-icon")
+        for (const proj of project) {
+            proj.addEventListener("click", (e) => toggleFocus(e))
+            proj.addEventListener("click", () => renderProjectTasks())
         }
     }
+    const addProjectEL = () => {
+        let addProject = document.querySelector("#add-proj");
+        addProject.addEventListener("click", () => projectModal())
+    }
+    const addProjectBtnEL = () => {
+        let addProjectBtn = document.querySelector("#add-proj-btn");
+        addProjectBtn.addEventListener("click", () => createProject())
+    }
 
-    return {taskTitle, taskDueDate, taskDescr, taskPriority}
+    return { coverDivEL, newTaskEL, addTaskEL, checkboxEL, delBtnEL, taskContainerEL, projectEL, addProjectEL, addProjectBtnEL }
 }
 
+const changeTaskStatus = () => {
+    let taskStatus = document.querySelector("#task-status")
+    let checkTask = document.querySelector(".incomplete-tasks").hasChildNodes();
+    let status = (checkTask) ? "<span id='status-color'>You've</span> got tasks to do!" : "<span id='status-color'>No more</span> tasks left. Hurray!"
+    taskStatus.innerHTML = status
+}
+
+
+//-----------------------------------------------------MODAL FORM FUNCTIONS STARTS HERE-------------------------------------------------------------//
 
 //Create Modal Form
 const taskModal = (title="Title", date="", descr="Notes here", priority="none") => {
@@ -96,9 +105,6 @@ const taskModal = (title="Title", date="", descr="Notes here", priority="none") 
 
 const removeModal = () => {
     let div = document.querySelector("#cover-div");
-    // let {taskTitle, taskDueDate, taskDescr, taskPriority} = getTaskModalDetails()
-    // let index = findTask(taskTitle.placeholder, taskDescr.placeholder, taskDueDate.value, taskPriority)
-    // console.log(index)
     div.remove()
 }
 
@@ -108,15 +114,39 @@ const closeModal = (e) => {
     }
 }
 
-const toggleCompleteStatus = (e) => {
-    let allTasks = generalInbox.getAllTasks(); 
+const getTaskModalDetails = () => {
+    let taskTitle = document.querySelector("#title");
+    let taskDueDate = document.querySelector("#task-date");
+    let taskDescr = document.querySelector("#descr");
+    let taskRadioBtn = document.getElementsByClassName("priority-radio")
+    let taskPriority = ''
 
-    let index = e.target.getAttribute("data-id");
-    allTasks[index].isComplete = (allTasks[index].isComplete) ? false : true
-    renderTask()
+    for (const radio of taskRadioBtn) {
+        if (radio.checked) {
+            taskPriority = radio.id
+        }
+    }
+
+    return {taskTitle, taskDueDate, taskDescr, taskPriority}
 }
 
-const renderTask = () => {
+//-----------------------------------------------------MODAL FORM FUNCTIONS END HERE-------------------------------------------------------------//
+
+//--------------------------------------------------RENDERED TASK FUNCTIONS START HERE-----------------------------------------------------------//
+
+
+const toggleCompleteStatus = (e) => {
+    let index = e.target.getAttribute("data-id");
+    let {taskTitle, taskDueDate, taskDescr, taskComplete, taskPriority} = getTaskCtnDetails(index)
+
+    // use !taskComplete bc as you click on the checkbox, it becomes the opposite of it's actual status
+    let [targProj, ind] = findTask(taskTitle, taskDescr, taskDueDate, taskPriority, !taskComplete)
+    targProj[ind].isComplete = !targProj[ind].isComplete
+    let project = getProject()
+    renderTask(project)
+}
+
+const renderTask = (proj) => {
     //render task called when pressing add button 
     //will render all tasks inside inbox, checked or not
     //checks if isComplete is true, if yes, place it as 
@@ -132,69 +162,87 @@ const renderTask = () => {
         let date = (!duedate) ? "" : duedate
         let complete = (isComplete) ? "checked" : ""
         let html = `
-            <div class="task-list" data-id=${i}>
+            <div class="task-list ${priority}" data-id=${i}>
                 <div class="task-checkbox">
-                    <input type="checkbox" class="checkbox" id="task-${i}" ${complete} data-id=${i}>
+                    <input type="checkbox" class="checkbox" onclick="event.stopPropagation()" id="task-${i}" ${complete} data-id=${i}>
                     <label for="task-${i}"></label>
                 </div>
-                <div class="task-items">
+                <div class="task-items task-${i}">
                     <div class="task-title">${title}</div>
                     <div class="task-date">${date}</div>
                     <div class="task-descr hidden">${descr}</div>
                     <div class="task-priority hidden">${priority}</div>
                 </div>
-                <span class="material-icons del" data-id="${i}">delete</span>
+                <span class="material-icons del" onclick="event.stopPropagation()" data-id="${i}">delete</span>
             </div>
         `
         return html
     }
 
-    let allTask = generalInbox.getAllTasks()
-
-    for (let i = 0; i < allTask.length; i++) {
-        let container = (allTask[i].isComplete) ? completeTasks : incompleteTasks
-        container.innerHTML += taskTemplate(
-            allTask[i].title, 
-            allTask[i].descr, 
-            allTask[i].dueDate, 
-            allTask[i].priority, 
-            allTask[i].isComplete,
-            i
-        )
+    const addToInnerHTML = (arr) => {
+        for (let i = 0; i < arr.length; i++) {
+            let container = (arr[i].isComplete) ? completeTasks : incompleteTasks
+            container.innerHTML += taskTemplate(
+                arr[i].title, 
+                arr[i].descr, 
+                arr[i].dueDate, 
+                arr[i].priority, 
+                arr[i].isComplete,
+                i
+            )
+        }
     }
+
+    let allTasks = (proj.name === "Inbox") ? generalInbox.getAllTasks() : proj.tasks
+    addToInnerHTML(allTasks)
+    changeTaskStatus()
     eventListeners().checkboxEL()
     eventListeners().delBtnEL()
     eventListeners().taskContainerEL()
 }
 
+const getTaskCtnDetails = (index) => {
+    let task = document.querySelector(`.task-${index}`)
+    let taskTitle = task.children[0].textContent
+    let taskDueDate = task.children[1].textContent
+    let taskDescr = task.children[2].textContent
+    let taskPriority = task.children[3].textContent;
+    let taskComplete = document.querySelector(`#task-${index}`).checked
+
+    return {taskTitle, taskDueDate, taskDescr, taskComplete, taskPriority}
+}
+
 const addTask = () => {
     let {taskTitle, taskDueDate, taskDescr, taskPriority} = getTaskModalDetails()
-    Task(taskTitle.value, taskDescr.value, taskDueDate.value, taskPriority)
-    renderTask()
+    let project = getProject()
+    Task(taskTitle.value, taskDescr.value, taskDueDate.value, taskPriority, false, project)
+    renderTask(project)
     removeModal()
 }
 
 const deleteTask = (e) => {
     let index = e.target.getAttribute("data-id");
-    defaultProj.tasks.splice(index, 1)
-    renderTask()
+    let {taskTitle, taskDueDate, taskDescr, taskComplete, taskPriority} = getTaskCtnDetails(index)
+    let [targProj, ind] = findTask(taskTitle, taskDescr, taskDueDate, taskPriority, taskComplete)
+    targProj.splice(ind, 1)
+    let project = getProject()
+    renderTask(project)
 }
 
 const expandTask = (e) => {
     let index = e.getAttribute("data-id");
-    // let {title, dueDate, descr, isComplete, priority} = defaultProj.tasks[index] 
-    //default index is empty. used to pass to removeModal() to find the task without having to look for parent node.
-    // taskModal(title, dueDate, descr, priority)
+    let {taskTitle, taskDueDate, taskDescr, taskComplete, taskPriority} = getTaskCtnDetails(index)
+    taskModal(taskTitle, taskDueDate, taskDescr, taskPriority)
 }
 
 const setTaskDisplay = (incompTasks, compTasks) => {
-
-    let allTasks = generalInbox.getAllTasks()
+    let project = getProject()
+    let tasks = (project.name === "Inbox") ? generalInbox.getAllTasks() : project.tasks
 
     let incompCount = 0
     let compCount = 0
-    for (const task of allTasks) {
-        if (allTasks.length) {
+    for (const task of tasks) {
+        if (tasks.length) {
             if (task.isComplete) compCount++
             if (!task.isComplete) incompCount++
         }
@@ -206,4 +254,71 @@ const setTaskDisplay = (incompTasks, compTasks) => {
     return
 }
 
-export { eventListeners, renderTask, setTaskDisplay }
+//
+
+const toggleFocus = (e) => {
+    let focused = document.querySelector("#focused") 
+    focused.removeAttribute("id")
+    e.target.setAttribute("id", "focused")
+}
+
+const getProject = () => {
+    let focused = document.querySelector("#focused")
+    let projectName = focused.getAttribute("data-name");
+    for (const proj of generalInbox.allProj) {
+        if (proj.name === projectName) {
+            return proj
+        }
+    }
+}
+
+const renderProjectTasks = () => {
+    let project = getProject()
+    renderTask(project)
+}
+
+const renderProject = () => {
+    let projectContainer = document.querySelector("#project-container")
+    for (const proj of generalInbox.allProj) {
+        let name = proj.name
+        if (!(name==="Inbox")) {
+            projectContainer.innerHTML += `
+                <div class="project-icon" data-name="${name}">
+                    <span class="material-icons">tab</span>
+                    ${name}
+                </div>
+            `
+        }
+    }
+}
+
+const createProject = () => {
+    let name = document.querySelector("#project-name").value
+    if (name) {
+        Project(name);
+        renderProject()
+        //innerHTML removes previous eventlisteners bc you're making new instances
+        eventListeners().projectEL()
+        eventListeners().addProjectEL()
+        removeModal()
+    }
+    return
+}
+
+const projectModal = () => {
+    let div = document.createElement("div")
+    div.setAttribute("id", "cover-div")
+    div.innerHTML = `
+        <div id="project-modal">
+            <div id="project-ctn">
+                <input type="text" id="project-name" placeholder="Project name">
+                <span class="material-icons" id="add-proj-btn">add_circle_outline</span>
+            </div>
+        </div>
+    `
+    document.body.appendChild(div)
+    eventListeners().coverDivEL()
+    eventListeners().addProjectBtnEL()
+}
+
+export { eventListeners, renderTask, renderProject, setTaskDisplay }

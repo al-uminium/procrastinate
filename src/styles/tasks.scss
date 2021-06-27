@@ -1,0 +1,67 @@
+@mixin priority-border($color) {
+    border-right: 2px solid $color
+}
+$border-test: 1px solid rgb(66, 66, 66);
+
+.task-list {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgb(66, 66, 66);
+    padding: 1.5rem 0;
+
+    .task-items {
+        margin-left: 1.5rem;
+    }
+
+    .del {
+        margin-left: auto;
+        padding-right: 1rem;
+    }
+}
+
+.task-list:last-child {
+    border-bottom: none;
+}
+
+.ctn {
+    border: $border-test;
+    box-sizing: border-box;
+    min-height: 5rem;
+    width: auto;
+    margin: 0rem 2rem;
+    padding: 0.5rem;
+    background-color: rgb(30, 30, 30);
+    border-radius: 1rem;
+}
+
+.incomplete-tasks {
+    display: grid;
+    margin-top: 1.5rem;
+}
+
+.completed-tasks {
+    box-sizing: border-box;
+    margin-top: 1.5rem;
+    display: grid;
+    color: #636363;
+}
+
+.hidden {
+    display: none;
+}
+
+.none {
+    @include priority-border(#9bc6c7)
+}
+
+.low {
+    @include priority-border(#5ed130)
+}
+
+.medium {
+    @include priority-border(#d19930)
+}
+
+.high {
+    @include priority-border(#d13830)
+}

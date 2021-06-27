@@ -12,6 +12,14 @@ $modal-width: 20rem;
     padding: 0.2rem 0.2rem;
 }
 
+@mixin modal-form {
+    background-color: #121212;
+    width: $modal-width;
+    color: whitesmoke;
+    margin: 25vh auto;
+    border-radius: 0.3rem;
+}
+
 #cover-div {
     position: fixed;
     top: 0;
@@ -23,13 +31,27 @@ $modal-width: 20rem;
 }
 
 #task-modal {
-    background-color: #121212;
+    @include modal-form;
     height: 20rem;
-    width: $modal-width;
-    color: whitesmoke;
-    opacity: 1;
-    margin: 25vh auto;
-    border-radius: 0.3rem;
+}
+
+#project-modal {
+    @include modal-form;
+    height: 10rem;
+}
+
+#project-ctn {
+    display: grid;
+    height: 100%;
+    #project-name {
+        @include input-style;
+        justify-self: center;
+    }
+    span {
+        justify-self: end;
+        align-self: flex-end;
+        margin: 0px 1rem 1rem 0px;
+    }
 }
 
 .get-task {
@@ -104,3 +126,4 @@ textarea {
         background-color: rgba(100, 100, 100, 1);
     }
 }
+
